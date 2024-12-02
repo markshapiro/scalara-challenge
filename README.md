@@ -3,7 +3,6 @@
 1. run `yarn install`
 
 2. run postgres on docker:
-<br/>
 ```
 docker run --name postgres -d -p 5432:5432 -e POSTGRES_PASSWORD=password postgres:alpine
 ```
@@ -14,7 +13,6 @@ docker run --name postgres -d -p 5432:5432 -e POSTGRES_PASSWORD=password postgre
 4. add some transactions to banks using `transactions` endpoint:
 <br/>(possible IBANs 1.1, 2.1, 2.2, 2.3, 3.1)
 <br/>(note: 1.2 is IBAN of user id=1 and bank id=2)
-<br/>
 ```
 POST
 http://localhost:3000/transactions
