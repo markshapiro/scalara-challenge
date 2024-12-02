@@ -39,11 +39,17 @@ export class WebhookController {
         result = {message:e.toString()}
       }
 
-      await fetch(body.url, {
-        method: 'post',
-        body: JSON.stringify(body),
-        headers: {'Content-Type': 'application/json'}
-      });
+      try {
+        await fetch(body.url, {
+          method: 'post',
+          body: JSON.stringify(body),
+          headers: {'Content-Type': 'application/json'}
+        });
+      } catch(e){
+        console.log("error:",e.toString())
+      }
+
+     
     })
 
     return null
