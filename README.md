@@ -8,7 +8,7 @@ docker run --name postgres -d -p 5432:5432 -e POSTGRES_PASSWORD=password postgre
 ```
 
 3. starte Server mit `npm run start`
-<br> Sie könne alle Endpukte ansehen und nutzen in `http://localhost:3000/api`
+<br> Sie könne alle Endpukte ansehen und nutzen in http://localhost:3000/api
 
 4. rufe Webhook Endpunkt auf in http://localhost:3000/api#/Webhooks/WebhookController_webhook
 
