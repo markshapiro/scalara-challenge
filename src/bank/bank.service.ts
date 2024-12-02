@@ -29,8 +29,8 @@ export class BankService {
 
   async syncBalance(): Promise<null> {
     return await this.bankRepository.query(`
-      UPDATE bank bb SET
-        balance = bb.balance + tmp.balance,
+      UPDATE bank b_upd SET
+        balance = b_upd.balance + tmp.balance,
         "lastSync" = CURRENT_TIMESTAMP
       FROM (
         SELECT b.id AS id, sum(tx."amount") AS balance FROM bank b
@@ -38,7 +38,7 @@ export class BankService {
         WHERE tx."created" > b."lastSync" OR b."lastSync" IS NULL
         GROUP BY b.id
       ) AS tmp(id, balance) 
-      WHERE tmp.id = bb.id
+      WHERE tmp.id = b_upd.id
     `);
   }
 }

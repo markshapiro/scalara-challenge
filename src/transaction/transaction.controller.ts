@@ -28,9 +28,6 @@ export class TransactionController {
   async createTransaction(
     @Body() body: CreateTxDto,
   ): Promise<{ message: string }> {
-
-    console.log(body)
-
     await this.TransactionModuleService.createTx(body);
     return { message: 'success' };
   }

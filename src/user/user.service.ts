@@ -39,36 +39,54 @@ export class UserService {
 
   async syncBalance(): Promise<null> {
     return await this.userRepository.query(`
-      UPDATE "user" uu SET
-        balance = uu.balance + tmp.balance,
+      UPDATE "user" u_upd SET
+        balance = tmp.balance,
         "lastSync" = CURRENT_TIMESTAMP
       FROM (
-        SELECT uu.id AS id, sum(b."balance") AS balance FROM "user" uu
-        JOIN "bank" b ON b."userId" = uu.id
-        WHERE b."lastSync" > uu."lastSync" OR uu."lastSync" IS NULL
-        GROUP BY uu.id
+          SELECT tmp.id, SUM(tmp.balance) AS balance FROM 
+          (
+              SELECT distinct on (b.id) u.id AS id, b."balance" AS balance
+              FROM "user" u
+              JOIN "bank" b_existing ON b_existing."userId" = u.id
+              JOIN "bank" b ON b."userId" = u.id
+              WHERE
+                b_existing."lastSync" IS NOT NULL
+                AND (u."lastSync" IS NULL OR b_existing."lastSync" > u."lastSync")
+          ) AS tmp
+          GROUP BY tmp.id
       ) AS tmp(id, balance) 
-      WHERE tmp.id = uu.id
+      WHERE tmp.id = u_upd.id
     `);
   }
 
   async syncMaxLend(): Promise<null> {
     return await this.userRepository.query(`
-      UPDATE "user" uu SET
-        maxLend = uu.maxLend,
+      WITH ids_to_update AS (
+        SELECT
+            DISTINCT u1.id AS id
+        FROM "user" u1
+        JOIN "user_friends_user" f ON u1."id" = f."userId_1"
+        JOIN "user" u_con ON u_con."id" = f."userId_2"
+        WHERE 
+
+        u1."lastSync" IS NOT NULL
+        AND u_con."lastSync" IS NOT NULL
+        AND (u1."lastSyncMaxLend" IS NULL OR u1."lastSyncMaxLend" < u_con."lastSync")
+      )
+
+      UPDATE "user" u_upd SET
+        "maxLend" = tmp.maxLend,
         "lastSyncMaxLend" = CURRENT_TIMESTAMP
       FROM (
         SELECT
-          u1.id AS id, SUM(u2.balance - u1.balance) AS maxLend
+          u1.id AS id, SUM(GREATEST(u2.balance - u1.balance, 0)) AS maxLend
         FROM "user" u1
         JOIN "user_friends_user" f ON u1."id" = f."userId_1"
         JOIN "user" u2 ON u2."id" = f."userId_2"
-        WHERE u2.balance > u1.balance
+        WHERE u1.id IN (SELECT tmp.id FROM ids_to_update tmp)
         GROUP BY u1.id
       ) AS tmp(id, maxLend) 
-      WHERE tmp.id = uu.id
+      WHERE tmp.id = u_upd.id
     `);
-
-    //AND u2."lastSync" > u1."lastSyncMaxLend" OR u1."lastSyncMaxLend" IS NULL
   }
 }
