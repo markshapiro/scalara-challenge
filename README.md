@@ -1,6 +1,6 @@
 
 
-1. instaliere alles mit `yarn install`
+1. installiere alles mit `yarn install`
 
 2. stelle Postgres bereit auf Docker:
 ```
