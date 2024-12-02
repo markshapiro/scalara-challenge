@@ -46,7 +46,7 @@ export class WebhookController {
           headers: {'Content-Type': 'application/json'}
         });
       } catch(e){
-        console.log("error:",e.toString())
+        console.log("error:", e.toString())
       }
     })
 
