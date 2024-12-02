@@ -33,8 +33,8 @@ export class BankService {
         balance = b_upd.balance + tmp.balance,
         "lastSync" = CURRENT_TIMESTAMP
       FROM (
-        SELECT b.id AS id, sum(tx."amount") AS balance FROM bank b
-        JOIN "transaction" tx ON tx."bankId" = b.id
+        SELECT b.id AS id, SUM(COALESCE(tx."amount", 0)) AS balance FROM bank b
+        LEFT JOIN "transaction" tx ON tx."bankId" = b.id
         WHERE tx."created" > b."lastSync" OR b."lastSync" IS NULL
         GROUP BY b.id
       ) AS tmp(id, balance) 
