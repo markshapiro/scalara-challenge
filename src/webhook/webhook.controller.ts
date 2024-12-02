@@ -48,8 +48,6 @@ export class WebhookController {
       } catch(e){
         console.log("error:",e.toString())
       }
-
-     
     })
 
     return null
