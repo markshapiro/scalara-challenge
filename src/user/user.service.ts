@@ -61,7 +61,23 @@ export class UserService {
 
   async syncMaxLend(): Promise<null> {
     return await this.userRepository.query(`
-      
+      WITH ids_to_update AS (
+        SELECT
+            DISTINCT u1.id AS id
+        FROM "user" u1
+        JOIN "user_friends_user" f ON u1."id" = f."userId_1"
+        JOIN "user" u_con ON u_con."id" = f."userId_2"
+        WHERE 
+
+        u1."lastSync" IS NOT NULL
+        AND u_con."lastSync" IS NOT NULL
+        AND (
+          u1."lastSyncMaxLend" IS NULL
+          OR u1."lastSyncMaxLend" < u_con."lastSync"
+          OR u1."lastSyncMaxLend" < u1."lastSync"
+        )
+      )
+
       UPDATE "user" u_upd SET
         "maxLend" = tmp.maxLend,
         "lastSyncMaxLend" = CURRENT_TIMESTAMP
@@ -71,6 +87,7 @@ export class UserService {
         FROM "user" u1
         JOIN "user_friends_user" f ON u1."id" = f."userId_1"
         JOIN "user" u2 ON u2."id" = f."userId_2"
+        WHERE u1.id IN (SELECT tmp.id FROM ids_to_update tmp)
         GROUP BY u1.id
       ) AS tmp(id, maxLend) 
       WHERE tmp.id = u_upd.id
