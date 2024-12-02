@@ -16,7 +16,8 @@ docker run --name postgres -d -p 5432:5432 -e POSTGRES_PASSWORD=password postgre
 <br/>(note: 1.2 is IBAN of user id=1 and bank id=2)
 <br/>
 ```
-POST http://localhost:3000/transactions
+POST
+http://localhost:3000/transactions
 {
   "IBAN": "2.1",
   "amount": 123
@@ -25,6 +26,7 @@ POST http://localhost:3000/transactions
 
 5. run webhook endpoint:
 ```
+PATCH
 http://localhost:3000/webhooks/run-processes
 {
   "process_id": 3,
